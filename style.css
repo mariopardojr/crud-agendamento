@@ -1,0 +1,100 @@
+@import url("https://fonts.googleapis.com/css2?family=Catamaran:wght@100..900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Catamaran" !important;
+}
+
+body {
+  background-color: #19181b;
+  color: #f5f4f5;
+  height: 100%;
+}
+
+main {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  padding: 12px;
+}
+
+p {
+  margin-bottom: 0 !important;
+}
+
+.heading {
+}
+
+.heading p {
+  color: #98959d;
+}
+
+.section-form {
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  background-color: #232225;
+  padding: 80px;
+  height: 100%;
+  border-radius: 12px;
+  justify-content: center;
+}
+
+.section-agenda {
+  padding: 80px 112px;
+  height: 100%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.time {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.daytime {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.daytime p {
+  color: #98959d;
+}
+
+.time-list .btn {
+  background-color: #2e2c30;
+  color: #b2afb6;
+}
+
+.time-list .btn:hover {
+  border: 1px solid #fff;
+}
+
+.time-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: large !important;
+}
+
+@media only screen and (max-width: 900px) {
+  main {
+    flex-direction: column;
+  }
+
+  .section-form {
+    padding: 80px 20px;
+  }
+}
