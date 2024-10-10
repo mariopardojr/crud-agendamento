@@ -24,9 +24,6 @@ p {
   margin-bottom: 0 !important;
 }
 
-.heading {
-}
-
 .heading p {
   color: #98959d;
 }
@@ -39,12 +36,16 @@ p {
   padding: 80px;
   height: 100%;
   border-radius: 12px;
-  justify-content: center;
 }
 
 .section-agenda {
   padding: 80px 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 32px;
   height: 100%;
+  width: 100%;
 }
 
 form {
@@ -89,12 +90,57 @@ form {
   font-size: large !important;
 }
 
+.heading-agenda {
+  display: flex;
+  justify-content: space-between;
+}
+
+.schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+}
+
+.schedule-card {
+  border: 1px solid #2e2c30;
+  border-radius: 8px;
+}
+
+.schedule-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2e2c30;
+  padding: 20px 24px
+}
+
+.schedule-list {
+  padding: 12px 24px;
+  list-style: none;
+  margin: 0
+}
+
+.card-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.icon {
+  width: 24px;
+}
+
 @media only screen and (max-width: 900px) {
   main {
     flex-direction: column;
   }
 
-  .section-form {
+  .section-form, .section-agenda {
     padding: 80px 20px;
+  }
+
+  .heading-agenda {
+    gap: 10px
   }
 }
