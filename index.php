@@ -142,8 +142,18 @@ if (isset($_POST['submit'])) {
         </div>
         <ul class="schedule-list">
             <?php foreach ($_SESSION['formData'] as $schedule): ?>
-              <li>
-                  <?= $schedule['name'] ?>, <?= $schedule['time'] ?>, <?= $schedule['date'] ?>
+              <li class="schedule-item">
+                  <div>
+                      <?= $schedule['time'] ?> <?= $schedule['name'] ?>
+                  </div>
+                  <div class="schedule-action">
+                      <button id="" class="btn btn-danger" name="">
+                          DELETE
+                      </button>
+                      <button id="" class="btn btn-warning" name="">
+                          EDIT
+                      </button>
+                  </div>
               </li>
             <?php endforeach; ?>
         </ul>

@@ -121,6 +121,17 @@ form {
     margin: 0
 }
 
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-action {
+    display: flex;
+    gap: 12px;
+}
+
 .card-title {
     display: flex;
     align-items: flex-start;
