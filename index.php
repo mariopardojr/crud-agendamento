@@ -1,15 +1,18 @@
 <?php
 session_start();
-$name = '';
-$time = '';
-$date = '';
+//$_SESSION['formData'] = [];
 
-//$name = $_POST['name'];
-//$time = $_POST['time'];
-//$date = $_POST['date'];
+//$name = '';
+//$time = '';
+//$date = '';
 
+$displayValidationMessage = false;
 
 if (isset($_POST['submit'])) {
+    if (!$_POST['customer'] || !$_POST['time'] || !$_POST['date']) {
+        $displayValidationMessage = true;
+    }
+
     !isset($_SESSION['formData']) && $_SESSION['formData'] = [];
     $customer = [
         'name' => $_POST['customer'] ?? '',
@@ -19,6 +22,10 @@ if (isset($_POST['submit'])) {
 
     $_SESSION['formData'][] = $customer;
     header('Location: index.php');
+}
+
+if (isset($_POST['delete'])) {
+    echo 'TEST!!!';
 }
 
 ?>
@@ -45,6 +52,9 @@ if (isset($_POST['submit'])) {
     </div>
 
     <form method="post" action="">
+        <?php if ($displayValidationMessage): ?>
+          <span>Insira todos os dados corretamente!</span>
+        <?php endif ?>
       <div>
         <label class="form-label" for="date">Data</label>
         <input id="date" class="form-control" type="date" name="date"/>
@@ -143,17 +153,18 @@ if (isset($_POST['submit'])) {
         <ul class="schedule-list">
             <?php foreach ($_SESSION['formData'] as $schedule): ?>
               <li class="schedule-item">
-                  <div>
-                      <?= $schedule['time'] ?> <?= $schedule['name'] ?>
-                  </div>
-                  <div class="schedule-action">
-                      <button id="" class="btn btn-danger" name="">
-                          DELETE
-                      </button>
-                      <button id="" class="btn btn-warning" name="">
-                          EDIT
-                      </button>
-                  </div>
+                <div class="schedule-info">
+                  <span><?= $schedule['time'] ?></span>
+                  <span><?= $schedule['name'] ?></span>
+                </div>
+                <div class="schedule-action">
+                  <button type="submit" class="btn btn-danger" name="delete">
+                    DELETE
+                  </button>
+                  <button type="submit" id="" class="btn btn-warning" name="edit">
+                    EDIT
+                  </button>
+                </div>
               </li>
             <?php endforeach; ?>
         </ul>
@@ -170,9 +181,7 @@ if (isset($_POST['submit'])) {
           <p>13h-18h</p>
         </div>
         <ul class="schedule-list">
-          <li>Test</li>
-          <li>Test</li>
-          <li>Test</li>
+
         </ul>
       </div>
     </div>
@@ -187,9 +196,7 @@ if (isset($_POST['submit'])) {
           <p>19h-21h</p>
         </div>
         <ul class="schedule-list">
-          <li>Test</li>
-          <li>Test</li>
-          <li>Test</li>
+
         </ul>
       </div>
     </div>
