@@ -1,12 +1,25 @@
 <?php
 session_start();
-//$_SESSION['formData'] = [];
 
-//$name = '';
-//$time = '';
-//$date = '';
+class Customer
+{
+    public string $name;
+    public string $time;
+    public string $date;
 
-$displayValidationMessage = false;
+    public function __construct($name, $time, $date)
+    {
+        $this->name = $name;
+        $this->time = $time;
+        $this->date = $date;
+    }
+
+    public function getFormattedTime(): string
+    {
+        return "{$this->time}:00";
+    }
+}
+
 
 if (isset($_POST['submit'])) {
     if (!$_POST['customer'] || !$_POST['time'] || !$_POST['date']) {
@@ -14,18 +27,12 @@ if (isset($_POST['submit'])) {
     }
 
     !isset($_SESSION['formData']) && $_SESSION['formData'] = [];
-    $customer = [
-        'name' => $_POST['customer'] ?? '',
-        'time' => $_POST['time'] ?? '',
-        'date' => $_POST['date'] ?? '',
-    ];
-
-    $_SESSION['formData'][] = $customer;
+    $_SESSION['formData'][] = new Customer($_POST['customer'] ?? '', $_POST['time'] ?? '', $_POST['date'] ?? '');
     header('Location: index.php');
 }
 
 if (isset($_POST['delete'])) {
-    echo 'TEST!!!';
+    
 }
 
 ?>
@@ -52,9 +59,6 @@ if (isset($_POST['delete'])) {
     </div>
 
     <form method="post" action="">
-        <?php if ($displayValidationMessage): ?>
-          <span>Insira todos os dados corretamente!</span>
-        <?php endif ?>
       <div>
         <label class="form-label" for="date">Data</label>
         <input id="date" class="form-control" type="date" name="date"/>
@@ -154,13 +158,15 @@ if (isset($_POST['delete'])) {
             <?php foreach ($_SESSION['formData'] as $schedule): ?>
               <li class="schedule-item">
                 <div class="schedule-info">
-                  <span><?= $schedule['time'] ?></span>
-                  <span><?= $schedule['name'] ?></span>
+                  <span><?= $schedule->getFormattedTime(); ?></span>
+                  <span><?= $schedule->name ?></span>
                 </div>
                 <div class="schedule-action">
-                  <button type="submit" class="btn btn-danger" name="delete">
-                    DELETE
-                  </button>
+                  <form method="post">
+                    <button type="submit" class="btn btn-danger" name="delete">
+                      DELETE
+                    </button>
+                  </form>
                   <button type="submit" id="" class="btn btn-warning" name="edit">
                     EDIT
                   </button>
