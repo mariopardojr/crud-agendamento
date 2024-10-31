@@ -1,24 +1,38 @@
 <?php
 session_start();
-$name = '';
-$time = '';
-$date = '';
 
-//$name = $_POST['name'];
-//$time = $_POST['time'];
-//$date = $_POST['date'];
+class Customer
+{
+    public string $name;
+    public string $time;
+    public string $date;
+
+    public function __construct($name, $time, $date)
+    {
+        $this->name = $name;
+        $this->time = $time;
+        $this->date = $date;
+    }
+
+    public function getFormattedTime(): string
+    {
+        return "{$this->time}:00";
+    }
+}
 
 
 if (isset($_POST['submit'])) {
-    !isset($_SESSION['formData']) && $_SESSION['formData'] = [];
-    $customer = [
-        'name' => $_POST['customer'] ?? '',
-        'time' => $_POST['time'] ?? '',
-        'date' => $_POST['date'] ?? '',
-    ];
+    if (!$_POST['customer'] || !$_POST['time'] || !$_POST['date']) {
+        $displayValidationMessage = true;
+    }
 
-    $_SESSION['formData'][] = $customer;
+    !isset($_SESSION['formData']) && $_SESSION['formData'] = [];
+    $_SESSION['formData'][] = new Customer($_POST['customer'] ?? '', $_POST['time'] ?? '', $_POST['date'] ?? '');
     header('Location: index.php');
+}
+
+if (isset($_POST['delete'])) {
+    
 }
 
 ?>
@@ -55,16 +69,16 @@ if (isset($_POST['submit'])) {
         <div class="daytime">
           <p>Manhã</p>
           <div class="time-list">
-            <input id="time-btn-9" type="radio" class="btn-check" name="time" value="9:00">
+            <input id="time-btn-9" type="radio" class="btn-check" name="time" value="9">
             <label class="btn" for="time-btn-9">9:00</label>
 
-            <input id="time-btn-10" type="radio" class="btn-check" name="time" value="10:00">
+            <input id="time-btn-10" type="radio" class="btn-check" name="time" value="10">
             <label class="btn" for="time-btn-10">10:00</label>
 
-            <input id="time-btn-11" type="radio" class="btn-check" name="time" value="11:00">
+            <input id="time-btn-11" type="radio" class="btn-check" name="time" value="11">
             <label class="btn" for="time-btn-11">11:00</label>
 
-            <input id="time-btn-12" type="radio" class="btn-check" name="time" value="12:00">
+            <input id="time-btn-12" type="radio" class="btn-check" name="time" value="12">
             <label class="btn" for="time-btn-12">12:00</label>
           </div>
         </div>
@@ -72,22 +86,22 @@ if (isset($_POST['submit'])) {
         <div class="daytime">
           <p>Tarde</p>
           <div class="time-list">
-            <input id="time-btn-13" type="radio" class="btn-check" name="time" value="13:00">
+            <input id="time-btn-13" type="radio" class="btn-check" name="time" value="13">
             <label class="btn" for="time-btn-13">13:00</label>
 
-            <input id="time-btn-14" type="radio" class="btn-check" name="time" value="14:00">
+            <input id="time-btn-14" type="radio" class="btn-check" name="time" value="14">
             <label class="btn" for="time-btn-14">14:00</label>
 
-            <input id="time-btn-15" type="radio" class="btn-check" name="time" value="15:00">
+            <input id="time-btn-15" type="radio" class="btn-check" name="time" value="15">
             <label class="btn" for="time-btn-15">15:00</label>
 
-            <input id="time-btn-16" type="radio" class="btn-check" name="time" value="16:00">
+            <input id="time-btn-16" type="radio" class="btn-check" name="time" value="16">
             <label class="btn" for="time-btn-16">16:00</label>
 
-            <input id="time-btn-17" type="radio" class="btn-check" name="time" value="17:00">
+            <input id="time-btn-17" type="radio" class="btn-check" name="time" value="17">
             <label class="btn" for="time-btn-17">17:00</label>
 
-            <input id="time-btn-18" type="radio" class="btn-check" name="time" value="18:00">
+            <input id="time-btn-18" type="radio" class="btn-check" name="time" value="18">
             <label class="btn" for="time-btn-18">18:00</label>
           </div>
         </div>
@@ -95,13 +109,13 @@ if (isset($_POST['submit'])) {
         <div class="daytime">
           <p>Noite</p>
           <div class="time-list">
-            <input id="time-btn-19" type="radio" class="btn-check" name="time" value="19:00">
+            <input id="time-btn-19" type="radio" class="btn-check" name="time" value="19">
             <label class="btn" for="time-btn-19">19:00</label>
 
-            <input id="time-btn-20" type="radio" class="btn-check" name="time" value="20:00">
+            <input id="time-btn-20" type="radio" class="btn-check" name="time" value="20">
             <label class="btn" for="time-btn-20">20:00</label>
 
-            <input id="time-btn-21" type="radio" class="btn-check" name="time" value="21:00">
+            <input id="time-btn-21" type="radio" class="btn-check" name="time" value="21">
             <label class="btn" for="time-btn-21">21:00</label>
           </div>
         </div>
@@ -143,17 +157,20 @@ if (isset($_POST['submit'])) {
         <ul class="schedule-list">
             <?php foreach ($_SESSION['formData'] as $schedule): ?>
               <li class="schedule-item">
-                  <div>
-                      <?= $schedule['time'] ?> <?= $schedule['name'] ?>
-                  </div>
-                  <div class="schedule-action">
-                      <button id="" class="btn btn-danger" name="">
-                          DELETE
-                      </button>
-                      <button id="" class="btn btn-warning" name="">
-                          EDIT
-                      </button>
-                  </div>
+                <div class="schedule-info">
+                  <span><?= $schedule->getFormattedTime(); ?></span>
+                  <span><?= $schedule->name ?></span>
+                </div>
+                <div class="schedule-action">
+                  <form method="post">
+                    <button type="submit" class="btn btn-danger" name="delete">
+                      DELETE
+                    </button>
+                  </form>
+                  <button type="submit" id="" class="btn btn-warning" name="edit">
+                    EDIT
+                  </button>
+                </div>
               </li>
             <?php endforeach; ?>
         </ul>
@@ -170,9 +187,7 @@ if (isset($_POST['submit'])) {
           <p>13h-18h</p>
         </div>
         <ul class="schedule-list">
-          <li>Test</li>
-          <li>Test</li>
-          <li>Test</li>
+
         </ul>
       </div>
     </div>
@@ -187,9 +202,7 @@ if (isset($_POST['submit'])) {
           <p>19h-21h</p>
         </div>
         <ul class="schedule-list">
-          <li>Test</li>
-          <li>Test</li>
-          <li>Test</li>
+
         </ul>
       </div>
     </div>
