@@ -1,14 +1,20 @@
 <?php
 session_start();
+//$_SESSION['formData'] = [];
+$morning = [];
+$afternoon = [];
+$night =  [];
 
 class Customer
 {
+    public string $id;
     public string $name;
     public string $time;
     public string $date;
 
     public function __construct($name, $time, $date)
     {
+        $this->id = uniqid();
         $this->name = $name;
         $this->time = $time;
         $this->date = $date;
@@ -20,19 +26,40 @@ class Customer
     }
 }
 
+function addScheduleToList($customer): void {
+    if ($customer->time >= 9 && $customer->time <= 12) {
+        $_SESSION['formData'][0][] = $customer;
+    }
+
+    if ($customer->time >= 13 && $customer->time <= 18) {
+        $_SESSION['formData'][1][] = $customer;
+    }
+
+    if ($customer->time >= 19) {
+        $_SESSION['formData'][2][] = $customer;
+    }
+}
 
 if (isset($_POST['submit'])) {
     if (!$_POST['customer'] || !$_POST['time'] || !$_POST['date']) {
         $displayValidationMessage = true;
     }
 
-    !isset($_SESSION['formData']) && $_SESSION['formData'] = [];
-    $_SESSION['formData'][] = new Customer($_POST['customer'] ?? '', $_POST['time'] ?? '', $_POST['date'] ?? '');
+    !isset($_SESSION['formData']) && $_SESSION['formData'] = [$morning, $afternoon, $night];
+
+    $customer = new Customer($_POST['customer'], $_POST['time'], $_POST['date']);
+    addScheduleToList($customer);
+    $morning = $_SESSION['formData'][0];
+    $afternoon = $_SESSION['formData'][1];
+    $night = $_SESSION['formData'][2];
+
     header('Location: index.php');
 }
 
 if (isset($_POST['delete'])) {
-    
+    $customers = $_SESSION['formData'];
+    array_splice($customers, $_POST['delete'], 1);
+    $_SESSION['formData'] = $customers;
 }
 
 ?>
@@ -155,22 +182,22 @@ if (isset($_POST['delete'])) {
           <p>09h-12h</p>
         </div>
         <ul class="schedule-list">
-            <?php foreach ($_SESSION['formData'] as $schedule): ?>
+            <?php foreach ($_SESSION['formData'][0] as $index => $schedule): ?>
               <li class="schedule-item">
                 <div class="schedule-info">
                   <span><?= $schedule->getFormattedTime(); ?></span>
                   <span><?= $schedule->name ?></span>
                 </div>
-                <div class="schedule-action">
                   <form method="post">
-                    <button type="submit" class="btn btn-danger" name="delete">
-                      DELETE
-                    </button>
+                      <div class="schedule-action">
+                      <button type="submit" class="btn btn-danger" name="delete" value="<?=$index?>">
+                          DELETE
+                      </button>
+                      <button type="submit" class="btn btn-warning" name="edit" value="<?=$index?>">
+                          EDIT
+                      </button>
+                      </div>
                   </form>
-                  <button type="submit" id="" class="btn btn-warning" name="edit">
-                    EDIT
-                  </button>
-                </div>
               </li>
             <?php endforeach; ?>
         </ul>
@@ -187,7 +214,24 @@ if (isset($_POST['delete'])) {
           <p>13h-18h</p>
         </div>
         <ul class="schedule-list">
-
+         <?php foreach ($_SESSION['formData'][1] as $index => $schedule): ?>
+             <li class="schedule-item">
+                 <div class="schedule-info">
+                     <span><?= $schedule->getFormattedTime(); ?></span>
+                     <span><?= $schedule->name ?></span>
+                 </div>
+                 <form method="post">
+                     <div class="schedule-action">
+                         <button type="submit" class="btn btn-danger" name="delete" value="<?=$index?>">
+                             DELETE
+                         </button>
+                         <button type="submit" class="btn btn-warning" name="edit" value="<?=$index?>">
+                             EDIT
+                         </button>
+                     </div>
+                 </form>
+             </li>
+         <?php endforeach; ?>
         </ul>
       </div>
     </div>
@@ -202,7 +246,25 @@ if (isset($_POST['delete'])) {
           <p>19h-21h</p>
         </div>
         <ul class="schedule-list">
+         <?php foreach ($_SESSION['formData'][2] as $index => $schedule): ?>
+             <li class="schedule-item">
+                 <div class="schedule-info">
+                     <span><?= $schedule->getFormattedTime(); ?></span>
+                     <span><?= $schedule->name ?></span>
+                 </div>
 
+                 <form method="post">
+                     <div class="schedule-action">
+                         <button type="submit" class="btn btn-danger" name="delete" value="<?=$index?>">
+                             DELETE
+                         </button>
+                         <button type="submit" class="btn btn-warning" name="edit" value="<?=$index?>">
+                             EDIT
+                         </button>
+                     </div>
+                 </form>
+             </li>
+         <?php endforeach; ?>
         </ul>
       </div>
     </div>
