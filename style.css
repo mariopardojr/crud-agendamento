@@ -1,171 +1,174 @@
 @import url("https://fonts.googleapis.com/css2?family=Catamaran:wght@100..900&display=swap");
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: "Catamaran" !important;
+  box-sizing: border-box;
+  font-family: "Catamaran" !important;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    background-color: #19181b;
-    color: #f5f4f5;
-    height: 100%;
+  background-color: #19181b;
+  color: #f5f4f5;
+  height: 100%;
 }
 
 main {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-    padding: 12px;
+  display: flex;
+  height: 100vh;
+  padding: 12px;
+  width: 100%;
 }
 
 p {
-    margin-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .heading p {
-    color: #98959d;
+  color: #98959d;
 }
 
 .section-form {
-    display: flex;
-    gap: 12px;
-    flex-direction: column;
-    background-color: #232225;
-    padding: 80px;
-    justify-content: flex-start;
-    border-radius: 12px;
+  background-color: #232225;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: flex-start;
+  padding: 80px;
 }
 
 .section-agenda {
-    padding: 80px 112px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 32px;
-    height: 100%;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  height: 100%;
+  justify-content: flex-start;
+  padding: 80px 112px;
+  width: 100%;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
 .time {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .daytime {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .daytime p {
-    color: #98959d;
+  color: #98959d;
 }
 
 .time-list .btn {
-    background-color: #2e2c30;
-    color: #b2afb6;
+  background-color: #2e2c30;
+  color: #b2afb6;
 }
 
 .time-list .btn:hover {
-    border: 1px solid #B8952E;
-    color: #b2afb6;
+  border: 1px solid #b8952e;
+  color: #b2afb6;
 }
 
 .time-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .form-label {
-    font-weight: 600;
-    font-size: large !important;
+  font-size: large !important;
+  font-weight: 600;
 }
 
 .heading-agenda {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .schedule {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .schedule-card {
-    border: 1px solid #2e2c30;
-    border-radius: 8px;
+  border: 1px solid #2e2c30;
+  border-radius: 8px;
 }
 
 .schedule-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #2e2c30;
-    padding: 20px 24px
+  align-items: center;
+  border-bottom: 1px solid #2e2c30;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 24px;
 }
 
 .schedule-list {
-    padding: 12px 24px;
-    list-style: none;
-    margin: 0
+  list-style: none;
+  margin: 0;
+  padding: 12px 24px;
 }
 
 .schedule-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    gap: 20px
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 5px 0;
 }
 
 .schedule-info {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 .schedule-info span:first-child {
-    color: #B2AFB6;
-    font-weight: bold;
+  color: #b2afb6;
+  font-weight: bold;
 }
 
 .schedule-action {
-    display: flex;
-    gap: 12px;
+  display: flex;
+  gap: 12px;
 }
 
 .card-title {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
 }
 
 .icon {
-    width: 24px;
+  width: 24px;
 }
 
+.hidden {
+  display: none;
+}
 
 @media only screen and (max-width: 1000px) {
-    main {
-        flex-direction: column;
-    }
+  main {
+    flex-direction: column;
+  }
 
-    .section-form, .section-agenda {
-        padding: 80px 20px;
-    }
+  .section-form,
+  .section-agenda {
+    padding: 80px 20px;
+  }
 
-    .heading-agenda {
-        gap: 10px
-    }
+  .heading-agenda {
+    gap: 10px;
+  }
 }

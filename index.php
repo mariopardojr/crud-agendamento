@@ -1,9 +1,10 @@
 <?php
 session_start();
-//$_SESSION['formData'] = [];
-$morning = [];
-$afternoon = [];
-$night =  [];
+$morning;
+$afternoon;
+$night;
+$customerToEdit;
+$disabledButtons = [];
 
 class Customer
 {
@@ -28,40 +29,45 @@ class Customer
 
 function addScheduleToList($customer): void {
     if ($customer->time >= 9 && $customer->time <= 12) {
-        $_SESSION['formData'][0][] = $customer;
+      $GLOBALS['morning'][] = $customer;
     }
 
     if ($customer->time >= 13 && $customer->time <= 18) {
-        $_SESSION['formData'][1][] = $customer;
+      $GLOBALS['afternoon'][] = $customer;
     }
 
     if ($customer->time >= 19) {
-        $_SESSION['formData'][2][] = $customer;
+      $GLOBALS['night'][] = $customer;
     }
+}
+
+function setScheduleByTime(): void {
+  foreach ($_SESSION['formData'] as $schedule) {
+    addScheduleToList($schedule);
+  }
 }
 
 if (isset($_POST['submit'])) {
-    if (!$_POST['customer'] || !$_POST['time'] || !$_POST['date']) {
-        $displayValidationMessage = true;
+    if (!isset($_SESSION['formData'])) {
+      $_SESSION['formData'] = [];
     }
 
-    !isset($_SESSION['formData']) && $_SESSION['formData'] = [$morning, $afternoon, $night];
+    setScheduleByTime();
 
     $customer = new Customer($_POST['customer'], $_POST['time'], $_POST['date']);
-    addScheduleToList($customer);
-    $morning = $_SESSION['formData'][0];
-    $afternoon = $_SESSION['formData'][1];
-    $night = $_SESSION['formData'][2];
+    $_SESSION['formData'][] = $customer;
 
-    header('Location: index.php');
+    addScheduleToList($customer);
+    $GLOBALS['disabledButtons'][] = $_POST['time'];
 }
 
 if (isset($_POST['delete'])) {
-    $customers = $_SESSION['formData'];
-    array_splice($customers, $_POST['delete'], 1);
-    $_SESSION['formData'] = $customers;
-}
+    $_SESSION['formData'] = array_filter($_SESSION['formData'], function ($customer) {
+      return $customer->id != $_POST['delete'];
+    });
 
+    setScheduleByTime();
+}
 ?>
 
 <!DOCTYPE html>
@@ -96,7 +102,7 @@ if (isset($_POST['delete'])) {
         <div class="daytime">
           <p>Manhã</p>
           <div class="time-list">
-            <input id="time-btn-9" type="radio" class="btn-check" name="time" value="9">
+            <input id="time-btn-9" type="radio" class="btn-check" name="time" value="9" disabled>
             <label class="btn" for="time-btn-9">9:00</label>
 
             <input id="time-btn-10" type="radio" class="btn-check" name="time" value="10">
@@ -154,7 +160,7 @@ if (isset($_POST['delete'])) {
           <input id="customer" class="form-control" type="text" name="customer"/>
         </div>
       </div>
-      <button id="submitButton" class="btn btn-warning w-100" name="submit">
+      <button id="submitButton" class="btn btn-warning w-100" name="submit" onclick="onFormSubmit()">
         AGENDAR
       </button>
     </form>
@@ -182,24 +188,26 @@ if (isset($_POST['delete'])) {
           <p>09h-12h</p>
         </div>
         <ul class="schedule-list">
-            <?php foreach ($_SESSION['formData'][0] as $index => $schedule): ?>
+          <?php if (isset($morning)): ?>
+            <?php foreach ($morning as $index => $schedule): ?>
               <li class="schedule-item">
                 <div class="schedule-info">
                   <span><?= $schedule->getFormattedTime(); ?></span>
                   <span><?= $schedule->name ?></span>
                 </div>
-                  <form method="post">
-                      <div class="schedule-action">
-                      <button type="submit" class="btn btn-danger" name="delete" value="<?=$index?>">
-                          DELETE
-                      </button>
-                      <button type="submit" class="btn btn-warning" name="edit" value="<?=$index?>">
-                          EDIT
-                      </button>
-                      </div>
-                  </form>
+                <form method="post">
+                    <div class="schedule-action">
+                    <button type="submit" class="btn btn-danger" name="delete" value="<?=$schedule->id?>">
+                        DELETE
+                    </button>
+                    <button type="submit" class="btn btn-warning" name="edit" value="<?=$schedule->id?>">
+                        EDIT
+                    </button>
+                    </div>
+                </form>
               </li>
             <?php endforeach; ?>
+          <?php endif; ?>
         </ul>
       </div>
     </div>
@@ -214,7 +222,8 @@ if (isset($_POST['delete'])) {
           <p>13h-18h</p>
         </div>
         <ul class="schedule-list">
-         <?php foreach ($_SESSION['formData'][1] as $index => $schedule): ?>
+        <?php if (isset($afternoon)): ?>
+         <?php foreach ($afternoon as $index => $schedule): ?>
              <li class="schedule-item">
                  <div class="schedule-info">
                      <span><?= $schedule->getFormattedTime(); ?></span>
@@ -222,16 +231,17 @@ if (isset($_POST['delete'])) {
                  </div>
                  <form method="post">
                      <div class="schedule-action">
-                         <button type="submit" class="btn btn-danger" name="delete" value="<?=$index?>">
+                         <button type="submit" class="btn btn-danger" name="delete" value="<?=$schedule->id?>">
                              DELETE
                          </button>
-                         <button type="submit" class="btn btn-warning" name="edit" value="<?=$index?>">
+                         <button type="submit" class="btn btn-warning" name="edit" value="<?=$schedule->id?>">
                              EDIT
                          </button>
                      </div>
                  </form>
              </li>
-         <?php endforeach; ?>
+          <?php endforeach; ?>
+         <?php endif;?>
         </ul>
       </div>
     </div>
@@ -246,29 +256,32 @@ if (isset($_POST['delete'])) {
           <p>19h-21h</p>
         </div>
         <ul class="schedule-list">
-         <?php foreach ($_SESSION['formData'][2] as $index => $schedule): ?>
-             <li class="schedule-item">
-                 <div class="schedule-info">
-                     <span><?= $schedule->getFormattedTime(); ?></span>
-                     <span><?= $schedule->name ?></span>
-                 </div>
+          <?php if (isset($night)): ?>
+            <?php foreach ($night as $index => $schedule): ?>
+              <li class="schedule-item">
+                  <div class="schedule-info">
+                      <span><?= $schedule->getFormattedTime(); ?></span>
+                      <span><?= $schedule->name ?></span>
+                  </div>
 
-                 <form method="post">
-                     <div class="schedule-action">
-                         <button type="submit" class="btn btn-danger" name="delete" value="<?=$index?>">
-                             DELETE
-                         </button>
-                         <button type="submit" class="btn btn-warning" name="edit" value="<?=$index?>">
-                             EDIT
-                         </button>
-                     </div>
-                 </form>
-             </li>
-         <?php endforeach; ?>
+                  <form method="post">
+                      <div class="schedule-action">
+                          <button type="submit" class="btn btn-danger" name="delete" value="<?=$schedule->id?>">
+                              DELETE
+                          </button>
+                          <button type="submit" class="btn btn-warning" name="edit" value="<?=$schedule->id?>">
+                              EDIT
+                          </button>
+                      </div>
+                  </form>
+              </li>
+            <?php endforeach; ?>
+          <?php endif;?>
         </ul>
       </div>
     </div>
   </section>
 </main>
+<script src="script.js"></script>
 </body>
 </html>
