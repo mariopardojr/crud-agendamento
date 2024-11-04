@@ -48,7 +48,7 @@ p {
   width: 100%;
 }
 
-form {
+.customer-form {
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -154,8 +154,15 @@ form {
   width: 24px;
 }
 
-.hidden {
-  display: none;
+.no-schedule-message {
+  color: red;
+  text-align: center;
+}
+
+.search-date-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 @media only screen and (max-width: 1000px) {

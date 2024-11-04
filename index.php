@@ -1,10 +1,19 @@
 <?php
 session_start();
+date_default_timezone_set('America/Sao_Paulo');
+
+if (!isset($_SESSION['customers'])) {
+  $_SESSION['customers'] = [];
+}
+
+if (!isset($_SESSION['searchDate'])) {
+  $_SESSION['searchDate'] = date("Y-m-d");
+}
+
 $morning;
 $afternoon;
 $night;
 $customerToEdit;
-$disabledButtons = [];
 
 class Customer
 {
@@ -27,7 +36,34 @@ class Customer
     }
 }
 
-function addScheduleToList($customer): void {
+function filterScheduleByDate(): void {
+  if (count($_SESSION['customers']) > 0) {
+    $customers = array_filter($_SESSION['customers'], function($customer) {
+      return $customer->date == $_SESSION['searchDate'];
+    });
+
+    foreach ($customers as $customer) {
+      categorizeScheduleByTime($customer);
+    }
+  }
+}
+
+function setDisablebButtons(): void {
+  if (!isset($_SESSION['disabledButtons'])) {
+    $_SESSION['disabledButtons'] = [];
+  }
+
+  foreach ($_SESSION['customers'] as $customer) {
+    $_SESSION['disablebButtons'][] = $customer->time;
+  }
+  
+}
+
+function handleDisableButton($value): bool {
+  return $_SESSION['disabledButtons'] && in_array($value, $_SESSION['disabledButtons']);
+}
+
+function categorizeScheduleByTime($customer): void {
     if ($customer->time >= 9 && $customer->time <= 12) {
       $GLOBALS['morning'][] = $customer;
     }
@@ -41,33 +77,38 @@ function addScheduleToList($customer): void {
     }
 }
 
-function setScheduleByTime(): void {
-  foreach ($_SESSION['formData'] as $schedule) {
-    addScheduleToList($schedule);
+function retrieveSchedule(): void {
+  foreach ($_SESSION['customers'] as $schedule) {
+    categorizeScheduleByTime($schedule);
   }
 }
 
 if (isset($_POST['submit'])) {
-    if (!isset($_SESSION['formData'])) {
-      $_SESSION['formData'] = [];
-    }
-
-    setScheduleByTime();
-
     $customer = new Customer($_POST['customer'], $_POST['time'], $_POST['date']);
-    $_SESSION['formData'][] = $customer;
-
-    addScheduleToList($customer);
+    $_SESSION['customers'][] = $customer;
+    $_SESSION['disabledButtons'][] = $_POST['time'];
     $GLOBALS['disabledButtons'][] = $_POST['time'];
 }
 
 if (isset($_POST['delete'])) {
-    $_SESSION['formData'] = array_filter($_SESSION['formData'], function ($customer) {
+    $_SESSION['customers'] = array_filter($_SESSION['customers'], function ($customer) {
       return $customer->id != $_POST['delete'];
     });
 
-    setScheduleByTime();
+    $_SESSION['disabledButtons'] = [];
+    setDisablebButtons();
 }
+
+if (isset($_POST['edit'])) {
+    $customerToEdit = $_POST['edit'];
+}
+
+if (isset($_POST['search'])) {
+  $_SESSION['searchDate'] = $_POST['searchDate'];
+}
+
+filterScheduleByDate();
+setDisablebButtons();
 ?>
 
 <!DOCTYPE html>
@@ -91,7 +132,7 @@ if (isset($_POST['delete'])) {
       </p>
     </div>
 
-    <form method="post" action="">
+    <form method="post" class="customer-form">
       <div>
         <label class="form-label" for="date">Data</label>
         <input id="date" class="form-control" type="date" name="date"/>
@@ -102,16 +143,16 @@ if (isset($_POST['delete'])) {
         <div class="daytime">
           <p>Manhã</p>
           <div class="time-list">
-            <input id="time-btn-9" type="radio" class="btn-check" name="time" value="9" disabled>
+            <input id="time-btn-9" type="radio" class="btn-check" name="time" value="9" <?php if (handleDisableButton(9)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-9">9:00</label>
 
-            <input id="time-btn-10" type="radio" class="btn-check" name="time" value="10">
+            <input id="time-btn-10" type="radio" class="btn-check" name="time" value="10" <?php if (handleDisableButton(10)) {echo 'disabled';} ?> > 
             <label class="btn" for="time-btn-10">10:00</label>
 
-            <input id="time-btn-11" type="radio" class="btn-check" name="time" value="11">
+            <input id="time-btn-11" type="radio" class="btn-check" name="time" value="11" <?php if (handleDisableButton(11)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-11">11:00</label>
 
-            <input id="time-btn-12" type="radio" class="btn-check" name="time" value="12">
+            <input id="time-btn-12" type="radio" class="btn-check" name="time" value="12" <?php if (handleDisableButton(12)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-12">12:00</label>
           </div>
         </div>
@@ -119,22 +160,22 @@ if (isset($_POST['delete'])) {
         <div class="daytime">
           <p>Tarde</p>
           <div class="time-list">
-            <input id="time-btn-13" type="radio" class="btn-check" name="time" value="13">
+            <input id="time-btn-13" type="radio" class="btn-check" name="time" value="13" <?php if (handleDisableButton(13)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-13">13:00</label>
 
-            <input id="time-btn-14" type="radio" class="btn-check" name="time" value="14">
+            <input id="time-btn-14" type="radio" class="btn-check" name="time" value="14" <?php if (handleDisableButton(14)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-14">14:00</label>
 
-            <input id="time-btn-15" type="radio" class="btn-check" name="time" value="15">
+            <input id="time-btn-15" type="radio" class="btn-check" name="time" value="15" <?php if (handleDisableButton(15)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-15">15:00</label>
 
-            <input id="time-btn-16" type="radio" class="btn-check" name="time" value="16">
+            <input id="time-btn-16" type="radio" class="btn-check" name="time" value="16" <?php if (handleDisableButton(16)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-16">16:00</label>
 
-            <input id="time-btn-17" type="radio" class="btn-check" name="time" value="17">
+            <input id="time-btn-17" type="radio" class="btn-check" name="time" value="17" <?php if (handleDisableButton(17)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-17">17:00</label>
 
-            <input id="time-btn-18" type="radio" class="btn-check" name="time" value="18">
+            <input id="time-btn-18" type="radio" class="btn-check" name="time" value="18" <?php if (handleDisableButton(18)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-18">18:00</label>
           </div>
         </div>
@@ -142,13 +183,13 @@ if (isset($_POST['delete'])) {
         <div class="daytime">
           <p>Noite</p>
           <div class="time-list">
-            <input id="time-btn-19" type="radio" class="btn-check" name="time" value="19">
+            <input id="time-btn-19" type="radio" class="btn-check" name="time" value="19" <?php if (handleDisableButton(19)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-19">19:00</label>
 
-            <input id="time-btn-20" type="radio" class="btn-check" name="time" value="20">
+            <input id="time-btn-20" type="radio" class="btn-check" name="time" value="20" <?php if (handleDisableButton(20)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-20">20:00</label>
 
-            <input id="time-btn-21" type="radio" class="btn-check" name="time" value="21">
+            <input id="time-btn-21" type="radio" class="btn-check" name="time" value="21" <?php if (handleDisableButton(21)) {echo 'disabled';} ?> >
             <label class="btn" for="time-btn-21">21:00</label>
           </div>
         </div>
@@ -160,23 +201,28 @@ if (isset($_POST['delete'])) {
           <input id="customer" class="form-control" type="text" name="customer"/>
         </div>
       </div>
-      <button id="submitButton" class="btn btn-warning w-100" name="submit" onclick="onFormSubmit()">
+      <button id="submitButton" class="btn btn-warning w-100" name="submit">
         AGENDAR
       </button>
     </form>
   </section>
 
-  <section class=" section-agenda
-      ">
+  <section class="section-agenda">
     <div class="heading-agenda">
       <div>
         <h2>Sua agenda</h2>
-        <p>Consulte os seus cortes de cabelo agendados por dia</p>
+        <p>Consulte os atendimentos agendados por dia</p>
       </div>
-      <div>
-        <label class="form-label" for="agenda-date">Data</label>
-        <input id="agenda-date" class="form-control" type="date" name="agendaDate"/>
-      </div>
+      <form method="post" class="search-date-form">
+        <div>
+          <label class="form-label" for="search-date">Data</label>
+          <input id="search-date" class="form-control" type="date" name="searchDate" value="<?=$_SESSION['searchDate']?>"/>
+        </div>
+        <button type="submit" id="searchButton" class="btn btn-warning w-100" name="search">
+          PESQUISAR
+        </button>
+      </form>
+
     </div>
     <div class="schedule">
       <div class="schedule-card">
@@ -205,8 +251,11 @@ if (isset($_POST['delete'])) {
                     </button>
                     </div>
                 </form>
-              </li>
+              </li> 
             <?php endforeach; ?>
+          <?php endif; ?>
+          <?php if (!isset($morning)): ?>
+            <p>Sem agendamentos</p>
           <?php endif; ?>
         </ul>
       </div>
@@ -242,6 +291,9 @@ if (isset($_POST['delete'])) {
              </li>
           <?php endforeach; ?>
          <?php endif;?>
+         <?php if (!isset($afternoon)): ?>
+            <p>Sem agendamentos</p>
+          <?php endif; ?>
         </ul>
       </div>
     </div>
@@ -277,6 +329,9 @@ if (isset($_POST['delete'])) {
               </li>
             <?php endforeach; ?>
           <?php endif;?>
+          <?php if (!isset($night)): ?>
+            <p>Sem agendamentos</p>
+          <?php endif; ?>
         </ul>
       </div>
     </div>
