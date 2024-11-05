@@ -112,8 +112,8 @@ filterScheduleByDate();
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-  <link rel="stylesheet" href="../custom.css">
-  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="custom.css">
+  <link rel="stylesheet" href="style.css"/>
   <title>Document</title>
 </head>
 <body>
@@ -250,7 +250,7 @@ filterScheduleByDate();
       <div class="schedule-card">
         <div class="schedule-card-header">
           <div class="card-title">
-            <img class="icon" src="../assets/morning.svg" alt="">
+            <img class="icon" src="assets/morning.svg" alt="">
             <span>Manhã - <?= date_format(date_create($_SESSION['searchDate']), 'd/m') ?></span>
           </div>
           <p>09h-12h</p>
@@ -287,7 +287,7 @@ filterScheduleByDate();
       <div class="schedule-card">
         <div class="schedule-card-header">
           <p class="card-title">
-            <img class="icon" src="../assets/afternoon.svg" alt="">
+            <img class="icon" src="assets/afternoon.svg" alt="">
             <span>Tarde - <?= date_format(date_create($_SESSION['searchDate']), 'd/m') ?></span>
           </p>
           <p>13h-18h</p>
@@ -324,7 +324,7 @@ filterScheduleByDate();
       <div class="schedule-card">
         <div class="schedule-card-header">
           <p class="card-title">
-            <img class="icon" src="../assets/night.svg" alt="">
+            <img class="icon" src="assets/night.svg" alt="">
             <span>Noite - <?= date_format(date_create($_SESSION['searchDate']), 'd/m') ?></span>
           </p>
           <p>19h-21h</p>
@@ -359,6 +359,6 @@ filterScheduleByDate();
     </div>
   </section>
 </main>
-<script src="../script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
