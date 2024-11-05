@@ -72,7 +72,8 @@ p {
 
 .time-list .btn {
   background-color: #2e2c30;
-  color: #b2afb6;
+  /* color: #b2afb6; */
+  color: #f5f4f5;
 }
 
 .time-list .btn:hover {
@@ -155,7 +156,7 @@ p {
 }
 
 .no-schedule-message {
-  color: red;
+  color: #98959d;
   text-align: center;
 }
 
