@@ -1,57 +1,34 @@
 <?php
-session_start();
+require_once "connection.php";
+require_once "service.php";
+require_once "model.php";
 date_default_timezone_set('America/Sao_Paulo');
 
-if (!isset($_SESSION['customers'])) {
-  $_SESSION['customers'] = [];
-}
+$customers = getCustomers($connection);
+$customerToEdit = $_SESSION['customerToEdit'] ?? null;
+$morning = [];
+$afternoon = [];
+$night = [];
 
 if (!isset($_SESSION['searchDate'])) {
   $_SESSION['searchDate'] = date("Y-m-d");
 }
 
-$morning;
-$afternoon;
-$night;
-
-class Customer
-{
-  public string $id;
-  public string $name;
-  public string $time;
-  public string $date;
-
-  public function __construct($name, $time, $date)
-  {
-      $this->id = uniqid();
-      $this->name = $name;
-      $this->time = $time;
-      $this->date = $date;
-  }
-
-  public function getFormattedTime(): string
-  {
-      return "{$this->time}:00";
-  }
-
-  public function update($name, $time, $date): void {
-    $this->name = $name;
-    $time && $this->time = $time;
-    $this->date = $date;
-  }
+if (!isset($_SESSION['customerToEdit'])) {
+  $_SESSION['customerToEdit'] = null;
 }
 
-function filterScheduleByDate(): void {
-  $customers = array_filter($_SESSION['customers'], function($customer) {
+function filterAndCategorizeCustomersByDate($data): void {
+  $customers = array_filter($data, function($customer) {
     return $customer->date == $_SESSION['searchDate'];
   });
 
   foreach ($customers as $customer) {
-    categorizeScheduleByTime($customer);
+    categorizeCustomersByTime($customer);
   }
 }
 
-function categorizeScheduleByTime($customer): void {
+function categorizeCustomersByTime($customer): void {
   if ($customer->time >= 9 && $customer->time <= 12) {
     $GLOBALS['morning'][] = $customer;
   }
@@ -63,47 +40,29 @@ function categorizeScheduleByTime($customer): void {
   if ($customer->time >= 19) {
     $GLOBALS['night'][] = $customer;
   }
+
+  usort($GLOBALS['morning'], function ($a, $b) {
+    return $a->time <=> $b->time;
+  });
+  usort($GLOBALS['afternoon'], function ($a, $b) {
+    return $a->time <=> $b->time;
+  });
+  usort($GLOBALS['night'], function ($a, $b) {
+    return $a->time <=> $b->time;
+  });
 }
 
-function getCustomerById($id): Customer {
-  foreach ($_SESSION['customers'] as $customer) {
-    if ($customer->id == $id) {
-      return $customer;
-    }
+function sendDataToJs() {
+  $arrayContent = "";
+  foreach ($GLOBALS['customers'] as $customer) {
+    $arrayContent.= $customer != end($GLOBALS['customers']) ? "{$customer->createJsObject()}, " : "{$customer->createJsObject()}";
   }
-  return null;
+
+  echo "<script>const customers = [{$arrayContent}];</script>";
 }
 
-function getUpdatedCustomer(): Customer {
-  $_SESSION['customerToEdit']->update($_POST['customer'], $_POST['time'], $_POST['date']);
-  $_SESSION['customers'] = array_filter($_SESSION['customers'], function ($customer) {
-    return $customer->id != $_SESSION['customerToEdit']->id;
-  });
-
-  return $_SESSION['customerToEdit'];
-}
-
- 
-if (isset($_POST['submit'])) {
-  $_SESSION['customers'][] = isset($_SESSION['customerToEdit']) ? getUpdatedCustomer() : new Customer($_POST['customer'], $_POST['time'], $_POST['date']);
-  isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit'] = null;
-}
-
-if (isset($_POST['delete'])) {
-  $_SESSION['customers'] = array_filter($_SESSION['customers'], function ($customer) {
-    return $customer->id != $_POST['delete'];
-  });
-}
-
-if (isset($_POST['edit'])) {  
-  $_SESSION['customerToEdit'] = getCustomerById($_POST['edit']);
-}
-
-if (isset($_POST['search'])) {
-  $_SESSION['searchDate'] = $_POST['searchDate'];
-}
-
-filterScheduleByDate();
+filterAndCategorizeCustomersByDate($customers);
+sendDataToJs();
 ?>
 
 <!DOCTYPE html>
@@ -112,8 +71,8 @@ filterScheduleByDate();
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-  <link rel="stylesheet" href="custom.css">
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="styles/custom.css">
+  <link rel="stylesheet" href="styles/style.css"/>
   <title>Document</title>
 </head>
 <body>
@@ -127,10 +86,10 @@ filterScheduleByDate();
       </p>
     </div>
 
-    <form method="post" class="customer-form">
+    <form id="customer-form" method="POST" action="form.php" class="customer-form">
       <div>
         <label class="form-label" for="date">Data</label>
-        <input id="date" class="form-control" type="date" name="date" value="<?=$_SESSION['customerToEdit']->date ?? null?>"/>
+        <input id="date" class="form-control" type="date" name="date" value="<?=$customerToEdit->date ?? '' ?>" />
       </div>
 
       <div class="time">
@@ -139,22 +98,22 @@ filterScheduleByDate();
           <p>Manhã</p>
           <div class="time-list">
             <input id="time-btn-9" type="radio" class="btn-check" name="time" value="9"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 9) {echo 'checked';} ?> 
+              <?php if (isset($customerToEdit) && ($customerToEdit->time == 9)) {echo 'checked';} ?> 
             >
             <label class="btn" for="time-btn-9">9:00</label>
 
             <input id="time-btn-10" type="radio" class="btn-check" name="time" value="10"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 10) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 10) {echo 'checked';} ?>
             > 
             <label class="btn" for="time-btn-10">10:00</label>
 
             <input id="time-btn-11" type="radio" class="btn-check" name="time" value="11"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 11) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 11) {echo 'checked';} ?>
             >
             <label class="btn" for="time-btn-11">11:00</label>
 
             <input id="time-btn-12" type="radio" class="btn-check" name="time" value="12"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 12) {echo 'checked';} ?> 
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 12) {echo 'checked';} ?> 
             >
             <label class="btn" for="time-btn-12">12:00</label>
           </div>
@@ -164,32 +123,32 @@ filterScheduleByDate();
           <p>Tarde</p>
           <div class="time-list">
             <input id="time-btn-13" type="radio" class="btn-check" name="time" value="13"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 13) {echo 'checked';} ?> 
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 13) {echo 'checked';} ?> 
             >
             <label class="btn" for="time-btn-13">13:00</label>
 
             <input id="time-btn-14" type="radio" class="btn-check" name="time" value="14"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 14) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 14) {echo 'checked';} ?>
             >
             <label class="btn" for="time-btn-14">14:00</label>
 
             <input id="time-btn-15" type="radio" class="btn-check" name="time" value="15"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 15) {echo 'checked';} ?> 
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 15) {echo 'checked';} ?> 
             >
             <label class="btn" for="time-btn-15">15:00</label>
 
             <input id="time-btn-16" type="radio" class="btn-check" name="time" value="16"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 16) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 16) {echo 'checked';} ?>
             >
             <label class="btn" for="time-btn-16">16:00</label>
 
             <input id="time-btn-17" type="radio" class="btn-check" name="time" value="17" 
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 17) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 17) {echo 'checked';} ?>
             >
             <label class="btn" for="time-btn-17">17:00</label>
 
             <input id="time-btn-18" type="radio" class="btn-check" name="time" value="18"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 18) {echo 'checked';} ?> 
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 18) {echo 'checked';} ?> 
             >
             <label class="btn" for="time-btn-18">18:00</label>
           </div>
@@ -199,17 +158,17 @@ filterScheduleByDate();
           <p>Noite</p>
           <div class="time-list">
             <input id="time-btn-19" type="radio" class="btn-check" name="time" value="19"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 19) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 19) {echo 'checked';} ?>
             >
             <label class="btn" for="time-btn-19">19:00</label>
 
             <input id="time-btn-20" type="radio" class="btn-check" name="time" value="20"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 20) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 20) {echo 'checked';} ?>
             >
             <label class="btn" for="time-btn-20">20:00</label>
 
             <input id="time-btn-21" type="radio" class="btn-check" name="time" value="21"
-              <?php if (isset($_SESSION['customerToEdit']) && $_SESSION['customerToEdit']->time == 21) {echo 'checked';} ?>
+              <?php if (isset($customerToEdit) && $customerToEdit->time == 21) {echo 'checked';} ?>
             >
             <label class="btn" for="time-btn-21">21:00</label>
           </div>
@@ -218,12 +177,12 @@ filterScheduleByDate();
 
       <div class="customer">
         <div>
-          <label class="form-label" for="customer">Cliente</label>
-          <input id="customer" class="form-control" type="text" name="customer" value="<?=$_SESSION['customerToEdit']->name ?? ''?>"/>
+          <label class="form-label" for="name">Cliente</label>
+          <input id="name" class="form-control" type="text" name="name" value="<?=$customerToEdit->name ?? '' ?>" />
         </div>
       </div>
-      <button id="submitButton" class="btn w-100 <?=isset($_SESSION['customerToEdit']) ? 'btn-info' : 'btn-warning'?>" name="submit">
-        <?=isset($_SESSION['customerToEdit']) ? 'UPDATE' : 'AGENDAR' ?>
+      <button id="submitButton" class="btn w-100 <?=isset($customerToEdit) ? 'btn-info' : 'btn-warning'?>" name="submit" disabled>
+        <?=isset($customerToEdit) ? 'UPDATE' : 'AGENDAR' ?>
       </button>
     </form>
   </section>
@@ -234,7 +193,7 @@ filterScheduleByDate();
         <h2>Sua agenda</h2>
         <p>Consulte os atendimentos agendados por dia</p>
       </div>
-      <form method="post" class="search-date-form">
+      <form method="post" action="form.php" class="search-date-form">
         <div>
           <label class="form-label" for="search-date">Data</label>
           <input id="search-date" class="form-control" type="date" name="searchDate" value="<?=$_SESSION['searchDate']?>"/>
@@ -263,15 +222,15 @@ filterScheduleByDate();
                   <span><?= $customer->getFormattedTime(); ?></span>
                   <span><?= $customer->name ?></span>
                 </div>
-                <form method="post">
-                    <div class="schedule-action">
+                <form method="post" action="form.php">
+                  <div class="schedule-action">
                     <button type="submit" class="btn btn-danger" name="delete" data-time="<?=$customer->time?>" data-date="<?=$customer->date?>" value="<?=$customer->id?>">
-                        DELETE
+                      DELETE
                     </button>
-                    <button type="submit" class="btn btn-warning" name="edit" value="<?=$customer->id?>">
+                    <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
                         EDIT
                     </button>
-                    </div>
+                  </div>
                 </form>
               </li> 
             <?php endforeach; ?>
@@ -300,15 +259,15 @@ filterScheduleByDate();
                      <span><?= $customer->getFormattedTime(); ?></span>
                      <span><?= $customer->name ?></span>
                  </div>
-                 <form method="post">
-                     <div class="schedule-action">
-                         <button type="submit" class="btn btn-danger" name="delete" data-time="<?=$customer->time?>" data-date="<?=$customer->date?>" value="<?=$customer->id?>">
-                             DELETE
-                         </button>
-                         <button type="submit" class="btn btn-warning" name="edit" value="<?=$customer->id?>">
-                             EDIT
-                         </button>
-                     </div>
+                 <form method="post" action="form.php">
+                    <div class="schedule-action">
+                      <button type="submit" class="btn btn-danger" name="delete" data-time="<?=$customer->time?>" data-date="<?=$customer->date?>" value="<?=$customer->id?>">
+                          DELETE
+                      </button>
+                      <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
+                          EDIT
+                      </button>
+                    </div>
                  </form>
              </li>
           <?php endforeach; ?>
@@ -338,12 +297,12 @@ filterScheduleByDate();
                       <span><?= $customer->name ?></span>
                   </div>
 
-                  <form method="post">
+                  <form method="post" action="form.php">
                       <div class="schedule-action">
                           <button type="submit" class="btn btn-danger" name="delete" data-time="<?=$customer->time?>" data-date="<?=$customer->date?>" value="<?=$customer->id?>">
                               DELETE
                           </button>
-                          <button type="submit" class="btn btn-warning" name="edit" value="<?=$customer->id?>">
+                          <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
                               EDIT
                           </button>
                       </div>
