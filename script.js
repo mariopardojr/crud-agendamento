@@ -1,51 +1,36 @@
-document.getElementById("submitButton").addEventListener("click", () => {
-  const time = document.querySelector('input[name="time"]:checked').value;
+const disableTimeButtons = () => {
   const date = document.getElementById("date").value;
-
-  if (date && time) {
-    !localStorage.getItem("disabledButtons") &&
-      localStorage.setItem("disabledButtons", JSON.stringify([]));
-
-    const disabledOptions = [
-      ...JSON.parse(localStorage.getItem("disabledButtons")),
-    ];
-    const time = document.querySelector('input[name="time"]:checked').value;
-    const date = document.getElementById("date").value;
-
-    disabledOptions.push({ date, time });
-    localStorage.setItem("disabledButtons", JSON.stringify(disabledOptions));
+  if (customers && customers.length) {
+    customers
+      .filter((customer) => customer.date === date)
+      .forEach((customer) => {
+        document.getElementById(`time-btn-${customer.time}`).disabled = true;
+      });
   }
-});
+};
+
+const params = new URLSearchParams(window.location.search);
+
+if (params.get("event") === "edit") {
+  disableTimeButtons();
+  document.getElementById("submitButton").disabled = false;
+  document.querySelector("input[name='time']:checked").disabled = false;
+}
 
 document.getElementById("date").addEventListener("change", (event) => {
-  const disabledButtons = localStorage.getItem("disabledButtons");
-
-  if (disabledButtons) {
-    const parsedDisabledButtons = JSON.parse(disabledButtons);
-    if (parsedDisabledButtons.length) {
-      const timeOptions = parsedDisabledButtons.filter(
-        (option) => option.date == event.target.value
-      );
-      timeOptions.forEach((option) => {
-        document.getElementById(`time-btn-${option.time}`).disabled = true;
-      });
-    }
-  }
+  disableTimeButtons(event);
 });
 
-document.querySelectorAll('button[name="delete"]').forEach((button) => {
-  button.addEventListener("click", () => {
-    const disabledButtons = localStorage.getItem("disabledButtons");
-    const date = button.dataset.date;
-    const time = button.dataset.time;
+const form = document.getElementById("customer-form");
+const submitButton = document.getElementById("submitButton");
 
-    if (disabledButtons) {
-      const parsedDisabledButtons = JSON.parse(disabledButtons);
-      const filteredOptions = parsedDisabledButtons.filter(
-        (option) => option.date != date && option.time != time
-      );
-      localStorage.setItem("disabledButtons", JSON.stringify(filteredOptions));
-      document.getElementById(`time-btn-${time}`).disabled = false;
-    }
-  });
+form.addEventListener("input", () => {
+  const fields = [
+    ...document.querySelectorAll("input[name='time']"),
+    document.getElementById("date"),
+    document.getElementById("name"),
+  ];
+
+  isFormFilled = fields.every((input) => input.value.trim() !== "");
+  submitButton.disabled = !isFormFilled;
 });
