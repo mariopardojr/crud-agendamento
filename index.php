@@ -44,10 +44,14 @@ function categorizeCustomersByTime($customer): void {
   usort($GLOBALS['morning'], function ($a, $b) {
     return $a->time <=> $b->time;
   });
-  usort($GLOBALS['afternoon'], function ($a, $b) {
-    return $a->time <=> $b->time;
-  });
-  usort($GLOBALS['night'], function ($a, $b) {
+
+  sortCustomerByTime($GLOBALS['morning']);
+  sortCustomerByTime($GLOBALS['afternoon']);
+  sortCustomerByTime($GLOBALS['night']);
+}
+
+function sortCustomerByTime($customers) {
+  usort($customers, function ($a, $b) {
     return $a->time <=> $b->time;
   });
 }
