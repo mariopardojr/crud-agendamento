@@ -29,6 +29,12 @@
   }
   
   if (isset($_POST['edit'])) {
+    if ($_SESSION['customerToEdit']) {
+      $_SESSION['customerToEdit'] = null;
+      header("Location: index.php");
+      return;
+    }
+    
     $_SESSION['customerToEdit'] = getCustomerById($connection, $_POST['edit']);
     header("Location: index.php?event=edit");
   }

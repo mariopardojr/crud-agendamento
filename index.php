@@ -228,7 +228,11 @@ sendDataToJs();
                       DELETE
                     </button>
                     <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
+                      <?php if (isset($customerToEdit) && $customer->id == $customerToEdit->id): ?>
+                        <img class="icon" src="assets/x-circle.svg">
+                      <?php else: ?>
                         EDIT
+                      <?php endif; ?>
                     </button>
                   </div>
                 </form>
@@ -265,7 +269,11 @@ sendDataToJs();
                           DELETE
                       </button>
                       <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
+                        <?php if (isset($customerToEdit) && $customer->id == $customerToEdit->id): ?>
+                          <img class="icon" src="assets/x-circle.svg">
+                        <?php else: ?>
                           EDIT
+                        <?php endif; ?>
                       </button>
                     </div>
                  </form>
@@ -303,7 +311,11 @@ sendDataToJs();
                               DELETE
                           </button>
                           <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
+                            <?php if (isset($customerToEdit) && $customer->id == $customerToEdit->id): ?>
+                              <img class="icon" src="assets/x-circle.svg">
+                            <?php else: ?>
                               EDIT
+                            <?php endif; ?>
                           </button>
                       </div>
                   </form>
