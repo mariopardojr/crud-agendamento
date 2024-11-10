@@ -12,6 +12,10 @@ const disableTimeButtons = () => {
 const params = new URLSearchParams(window.location.search);
 
 if (params.get("event") === "edit") {
+  const editButtons = [
+    ...document.querySelectorAll("button[name='edit']"),
+  ].filter((button) => button.innerText == "EDIT");
+  editButtons.forEach((button) => (button.disabled = true));
   disableTimeButtons();
   document.getElementById("submitButton").disabled = false;
   document.querySelector("input[name='time']:checked").disabled = false;
