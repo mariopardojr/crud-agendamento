@@ -72,13 +72,24 @@ p {
 
 .time-list .btn {
   background-color: #2e2c30;
-  /* color: #b2afb6; */
-  color: #f5f4f5;
+  border: 1px solid #3e3c41;
+  color: #b2afb6;
 }
 
 .time-list .btn:hover {
-  border: 1px solid #b8952e;
+  background-color: #3e3c41;
   color: #b2afb6;
+}
+
+.time-list .btn-check:checked + label {
+  border: 1px solid #b8952e;
+  color: #b8952e;
+}
+
+.time-list .btn-check:disabled + label {
+  background-color: #232225;
+  border: 1px solid #2e2c30;
+  color: #3e3c41;
 }
 
 .time-list {

@@ -1,12 +1,12 @@
 .form-control {
-    border: 1px solid #3E3C41;
-    background-color: #232225;
-    color: #B2AFB6
+  background-color: #232225;
+  border: 1px solid #3e3c41;
+  color: #b2afb6;
 }
 
 .form-control:focus {
-    border: 1px solid #B8952E;
-    background-color: #232225;
-    color: #B2AFB6;
-    box-shadow: none;
+  background-color: #232225;
+  border: 1px solid #b8952e;
+  box-shadow: none;
+  color: #b2afb6;
 }
