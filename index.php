@@ -227,7 +227,6 @@ sendDataToJs();
                   <span><?= $customer->name ?></span>
                 </div>
                 <form class="schedule-action" method="post" action="form.php">
-            
                   <button type="submit" class="btn btn-danger" name="delete" value="<?=$customer->id?>">
                     DELETE
                   </button>
@@ -302,7 +301,7 @@ sendDataToJs();
         </div>
         <ul class="schedule-list">
           <?php if (isset($night)): ?>
-            <?php foreach ($night as $index => $customer): ?>
+            <?php foreach ($night as $customer): ?>
               <li class="schedule-item">
                   <div class="schedule-info">
                       <span><?= $customer->getFormattedTime(); ?></span>
