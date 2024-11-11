@@ -3,19 +3,18 @@ require_once "connection.php";
 require_once "model.php";
 session_start();
 
-function createCustomer($connection, $name, $time, $date) {  
+function createCustomer($connection, $name, $time, $date) {
   $query = "INSERT INTO customers (name, time, date) VALUES ('{$name}', {$time}, '{$date}')";
   mysqli_query($connection, $query);
   header("Location: index.php");
   mysqli_close($connection);
 }
 
-function getCustomers($connection) {
-  $customers = [];
+function getCustomers($connection) {  $customers = [];
   $query = "SELECT * FROM customers";
   $response = mysqli_query($connection, $query);
 
-  if ($response && mysqli_num_rows($response)) {
+  if ($response && mysqli_num_rows($response) > 0) {
     foreach ($response as $customer) {
       $customers[] = new Customer($customer['id'], $customer['name'], $customer['time'], $customer['date']);
     }
@@ -23,6 +22,7 @@ function getCustomers($connection) {
 
   mysqli_close($connection);
   return $customers;
+
 }
 
 function getCustomerById($connection, $id) {

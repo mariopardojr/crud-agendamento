@@ -41,17 +41,17 @@ function categorizeCustomersByTime($customer): void {
     $GLOBALS['night'][] = $customer;
   }
 
+  sortCustomerByTime();
+}
+
+function sortCustomerByTime() {
   usort($GLOBALS['morning'], function ($a, $b) {
     return $a->time <=> $b->time;
   });
-
-  sortCustomerByTime($GLOBALS['morning']);
-  sortCustomerByTime($GLOBALS['afternoon']);
-  sortCustomerByTime($GLOBALS['night']);
-}
-
-function sortCustomerByTime($customers) {
-  usort($customers, function ($a, $b) {
+  usort($GLOBALS['afternoon'], function ($a, $b) {
+    return $a->time <=> $b->time;
+  });
+  usort($GLOBALS['night'], function ($a, $b) {
     return $a->time <=> $b->time;
   });
 }
@@ -185,7 +185,7 @@ sendDataToJs();
           <input id="name" class="form-control" type="text" name="name" value="<?=$customerToEdit->name ?? '' ?>" />
         </div>
       </div>
-      <button id="submitButton" class="btn w-100 <?=isset($customerToEdit) ? 'btn-info' : 'btn-warning'?>" name="submit" disabled>
+      <button type="submit" id="submitButton" class="btn w-100 <?=isset($customerToEdit) ? 'btn-info' : 'btn-warning'?>" name="submit" disabled>
         <?=isset($customerToEdit) ? 'UPDATE' : 'AGENDAR' ?>
       </button>
     </form>
@@ -226,19 +226,19 @@ sendDataToJs();
                   <span><?= $customer->getFormattedTime(); ?></span>
                   <span><?= $customer->name ?></span>
                 </div>
-                <form method="post" action="form.php">
-                  <div class="schedule-action">
-                    <button type="submit" class="btn btn-danger" name="delete" data-time="<?=$customer->time?>" data-date="<?=$customer->date?>" value="<?=$customer->id?>">
-                      DELETE
-                    </button>
-                    <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
-                      <?php if (isset($customerToEdit) && $customer->id == $customerToEdit->id): ?>
-                        <img class="icon" src="assets/x-circle.svg">
-                      <?php else: ?>
-                        EDIT
-                      <?php endif; ?>
-                    </button>
-                  </div>
+                <form class="schedule-action" method="post" action="form.php">
+            
+                  <button type="submit" class="btn btn-danger" name="delete" value="<?=$customer->id?>">
+                    DELETE
+                  </button>
+
+                  <button class="btn btn-warning" name="edit" value="<?=$customer->id?>">
+                    <?php if (isset($customerToEdit) && $customer->id == $customerToEdit->id): ?>
+                      <img class="icon" src="assets/x-circle.svg">
+                    <?php else: ?>
+                      EDIT
+                    <?php endif; ?>
+                  </button>
                 </form>
               </li> 
             <?php endforeach; ?>
