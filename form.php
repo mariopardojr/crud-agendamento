@@ -4,12 +4,13 @@
   if (isset($_POST['submit'])) {
     $customerToEdit = $_SESSION['customerToEdit'];
   
-  if (isset($customerToEdit)) {
-    $customerToEdit->update($_POST['name'], $_POST['time'], $_POST['date']);
-    updateCustomer($connection, $customerToEdit);
-    $_SESSION['customerToEdit'] = null;
-    return;
-  }
+    if (isset($customerToEdit)) {
+      $customerToEdit->update($_POST['name'], $_POST['time'], $_POST['date']);
+      updateCustomer($connection, $customerToEdit);
+      $_SESSION['customerToEdit'] = null;
+      return;
+    }
+
     createCustomer($connection, $_POST['name'], $_POST['time'], $_POST['date']);
   }
 
@@ -20,9 +21,7 @@
   
   if (isset($_POST['delete'])) {
     if ($_POST['delete'] === $_SESSION['customerToEdit']->id) {
-      echo 'TEST';
       $_SESSION['customerToEdit'] = null;
-      header("Location: index.php");
     }
 
     deleteCustomerById($connection, $_POST['delete']);
